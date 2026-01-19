@@ -2,12 +2,29 @@
 {
   "name": "cricbuzz-live",
   "version": "1.0.0",
-  "engines": { "node": "24.x" },
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "start": "node src/local.js",
     "dev": "nodemon src/local.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "ekamid"
+  },
+  "keywords": [
+    "cricbuzz",
+    "scrapper",
+    "cheerio",
+    "nodejs",
+    "express"
+  ],
+  "author": "Ebrahim Khalil",
+  "license": "MIT",
   "dependencies": {
     "axios": "^1.6.5",
     "cheerio": "1.0.0",
@@ -25,9 +42,9 @@
     "serverless-http": "^3.2.0",
     "swagger-ui-express": "^5.0.0",
     "uuid": "^9.0.1",
-    "undici": "^6.23.0"               // 👈 add this (or "^6")
+    "undici": "^6.23.0"
   },
   "overrides": {
-    "undici": "^6"                    // 👈 force any transitive undici to v6.x
+    "undici": "^6"
   }
 }
