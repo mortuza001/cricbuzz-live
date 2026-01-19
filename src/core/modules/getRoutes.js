@@ -1,52 +1,40 @@
-const { green } = require('colorette');
+
 const fs = require('fs');
-const { capitalizeFirstLetter } = require('../utils/formatter');
+const path = require('path');
 
-/**
- * Get Controller from Route Path
- * @param {string} controllerPath
- * @param {string} filePath
- */
-function _getController(controllerPath, filePath) {
-    if (fs.existsSync(controllerPath)) {
-        const msgType = green('routes');
+// Optional-color import to avoid crashes if colorette is absent
+let color = { green: (s) => s };
+try { color = require('colorette'); } catch (_) {}
 
-        const routeDir = green(filePath);
-        const message = `controller ${routeDir} registered`;
+function getRoutes({ baseDir, router }) {
+  if (!fs.existsSync(baseDir)) {
+    console.warn(`[routes] baseDir not found: ${baseDir}`);
+    return;
+  }
 
-        // require controller
-        require(controllerPath);
+  const entries = fs.readdirSync(baseDir, { withFileTypes: true });
+  for (const entry of entries) {
+    const full = path.join(baseDir, entry.name);
+
+    if (entry.isDirectory()) {
+      getRoutes({ baseDir: full, router });
+      continue;
     }
+
+    if (!entry.isFile() || !entry.name.toLowerCase().endsWith('.js')) continue;
+
+    try {
+      const attach = require(full);         // controller must export (router) => void
+      if (typeof attach === 'function') {
+        attach(router);
+        console.log(`${color.green('routes')}: registered ${color.green(entry.name)}`);
+      } else {
+        console.warn(`[routes] ${entry.name} did not export a function(router)`);
+      }
+    } catch (err) {
+      console.error(`[routes] failed to load ${full}`, err);
+    }
+  }
 }
-
-/**
- * Get Routes
- * @param {string} basePath
- */
-const getRoutes = (basePath) => {
-    const checkJS = basePath.match('src');
-
-    if (checkJS) {
-        // loop main controller directory
-        fs.readdirSync(basePath).forEach((file) => {
-            const regexExt = /^.*\.(js)$/;
-            const matchFile = file.match(regexExt);
-
-            const controllerPath = `${basePath}/${file}`;
-            const controllerExist = fs.existsSync(controllerPath);
-
-            if (matchFile) {
-                const splitFilename = file.split('.');
-                const filename = capitalizeFirstLetter(splitFilename[0]);
-
-                _getController(controllerPath, filename);
-            }
-
-            if (!matchFile || !controllerExist) {
-                getRoutes(controllerPath);
-            }
-        });
-    }
-};
 
 module.exports = { getRoutes };
