@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
 });
 
 // import your real routes here
-// const v1Routes = require("./routes/v1");
-// app.use("/v1", v1Routes);
+const v1Routes = require("./routes/v1");
+app.use("/v1", v1Routes);
 
 module.exports = app;
