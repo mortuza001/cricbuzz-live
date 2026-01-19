@@ -3,18 +3,14 @@
   "name": "cricbuzz-live",
   "version": "1.0.0",
   "engines": { "node": "24.x" },
-  "type": "commonjs",              // optional, but fine with Express + CJS
   "scripts": {
     "start": "node src/local.js",
     "dev": "nodemon src/local.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-
-
-{
   "dependencies": {
     "axios": "^1.6.5",
-    "cheerio": "1.0.0-rc.12",
+    "cheerio": "1.0.0",
     "colorette": "^2.0.20",
     "cors": "^2.8.5",
     "dotenv": "^16.3.2",
@@ -28,12 +24,10 @@
     "request-ip": "^3.3.0",
     "serverless-http": "^3.2.0",
     "swagger-ui-express": "^5.0.0",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "undici": "^6.23.0"               // 👈 add this (or "^6")
   },
   "overrides": {
-    "cheerio": "1.0.0-rc.12"
-  },
-  "engines": {
-    "node": "24.x"
+    "undici": "^6"                    // 👈 force any transitive undici to v6.x
   }
 }
