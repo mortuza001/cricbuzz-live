@@ -1,52 +1,56 @@
-const { green } = require('colorette');
+
+// src/core/modules/getRoutes.js
 const fs = require('fs');
-const { capitalizeFirstLetter } = require('../utils/formatter');
+const path = require('path');
 
-/**
- * Get Controller from Route Path
- * @param {string} controllerPath
- * @param {string} filePath
- */
-function _getController(controllerPath, filePath) {
-    if (fs.existsSync(controllerPath)) {
-        const msgType = green('routes');
+// Optional color helper (avoids crash if colorette isn't installed)
+let color = { green: (s) => s };
+try {
+  color = require('colorette');
+} catch (_) {
+  // no-op: keep plain output in production
+}
 
-        const routeDir = green(filePath);
-        const message = `controller ${routeDir} registered`;
-
-        // require controller
-        require(controllerPath);
-    }
+function isJsFile(name) {
+  return name.toLowerCase().endsWith('.js');
 }
 
 /**
- * Get Routes
- * @param {string} basePath
+ * Recursively load controllers and attach their routes onto the provided router.
+ * Each controller must export a function of the form: module.exports = (router) => { ... }
+ *
+ * @param {{ baseDir: string, router: import('express').Router }} opts
  */
-const getRoutes = (basePath) => {
-    const checkJS = basePath.match('src');
+function getRoutes({ baseDir, router }) {
+  if (!fs.existsSync(baseDir)) {
+    console.warn(`[routes] baseDir does not exist: ${baseDir}`);
+    return;
+  }
 
-    if (checkJS) {
-        // loop main controller directory
-        fs.readdirSync(basePath).forEach((file) => {
-            const regexExt = /^.*\.(js)$/;
-            const matchFile = file.match(regexExt);
+  const entries = fs.readdirSync(baseDir, { withFileTypes: true });
+  for (const entry of entries) {
+    const full = path.join(baseDir, entry.name);
 
-            const controllerPath = `${basePath}/${file}`;
-            const controllerExist = fs.existsSync(controllerPath);
-
-            if (matchFile) {
-                const splitFilename = file.split('.');
-                const filename = capitalizeFirstLetter(splitFilename[0]);
-
-                _getController(controllerPath, filename);
-            }
-
-            if (!matchFile || !controllerExist) {
-                getRoutes(controllerPath);
-            }
-        });
+    if (entry.isDirectory()) {
+      // Recurse into subdirectories
+      getRoutes({ baseDir: full, router });
+      continue;
     }
-};
+
+    if (!entry.isFile() || !isJsFile(entry.name)) continue;
+
+    try {
+      const attach = require(full); // controller must export a function(router)
+      if (typeof attach === 'function') {
+        attach(router);
+        console.log(`${color.green('routes')}: controller ${color.green(entry.name)} registered`);
+      } else {
+        console.warn(`[routes] ${entry.name} did not export a function(router)`);
+      }
+    } catch (err) {
+      console.error(`[routes] Failed to load controller: ${full}`, err);
+    }
+  }
+}
 
 module.exports = { getRoutes };
