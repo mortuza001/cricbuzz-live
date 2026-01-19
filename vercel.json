@@ -1,12 +1,9 @@
 
 {
+  "version": 2,
   "functions": {
     "api/**/*.js": {
-      "runtime": "nodejs",
       "includeFiles": "node_modules/undici/**"
     }
-  },
-  "routes": [
-    { "src": "/(.*)", "dest": "/api/index.js" }
-  ]
+  }
 }
