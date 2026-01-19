@@ -5,18 +5,18 @@ const helmet = require("helmet");
 
 const app = express();
 
-// Middleware
+// --- Global middleware ---
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
 
-// Example route
+// --- Health ---
 app.get("/", (req, res) => {
   console.log("Health /api/ hit at", new Date().toISOString());
   res.json({ message: "Cricbuzz Live API running" });
 });
 
-// import your real routes here
+// --- v1 routes ---
 const v1Routes = require("./routes/v1");
 app.use("/v1", v1Routes);
 
