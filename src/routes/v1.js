@@ -1,26 +1,12 @@
+const express = require('express');
+const path = require('path');
+const { getRoutes } = require('../core/modules/getRoutes');
 
-// src/routes/v1.js
-const express = require("express");
-const router = express.Router();
+const route = express.Router();
 
-// GET /v1/ping
-router.get("/ping", (req, res) => {
-  console.log("[V1] /ping hit");
-  res.json({ ok: true, route: "/v1/ping", ts: new Date().toISOString() });
-});
+const baseRoutes = path.resolve(`${__dirname}/../controllers`);
 
-// Example endpoint: GET /v1/matches/score/:id
-router.get("/matches/score/:id", async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    // TODO: implement actual logic (ensure any HTTP calls have timeouts)
-    res.json({ id, score: "demo" });
-  } catch (err) {
-    next(err);
-  }
-});
+module.exports = route;
 
-// 404 under /v1 (optional)
-router.use((req, res) => res.status(404).json({ error: "Not Found (v1)" }));
-
-module.exports = router;
+// Mapping Route
+getRoutes(baseRoutes);
