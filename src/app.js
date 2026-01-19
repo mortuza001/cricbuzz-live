@@ -12,6 +12,7 @@ app.use(express.json());
 
 // Example route
 app.get("/", (req, res) => {
+  console.log("Health /api/ hit at", new Date().toISOString());
   res.json({ message: "Cricbuzz Live API running" });
 });
 
