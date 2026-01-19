@@ -1,15 +1,12 @@
+
 {
-    "version": 2,
-    "builds": [
-        {
-            "src": "src/index.js",
-            "use": "@now/node"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "src/index.js"
-        }
-    ]
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs",
+      "includeFiles": "node_modules/undici/**"
+    }
+  },
+  "routes": [
+    { "src": "/(.*)", "dest": "/api/index.js" }
+  ]
 }
